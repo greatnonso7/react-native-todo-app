@@ -18,7 +18,11 @@ const MiddleButton = props => {
   const [isDatePickerVisible, setDatePickerVisibility] = React.useState(false);
   const [isTimePickerVisible, setTimePickerVisibility] = React.useState(false);
   const [task, setTask] = React.useState('');
-  const [error, setError] = React.useState(false);
+  const [error, setError] = React.useState({
+    taskTitle: false,
+    timeError: false,
+    dateError: false,
+  });
 
   const [value, setValue] = React.useState({
     index: '1',
@@ -56,15 +60,15 @@ const MiddleButton = props => {
 
   const addTask = async () => {
     if (!task || task.length === 0) {
-      return setError(true);
+      return setError({taskTitle: true, dateError: true, timeError: true});
     }
 
     if (!date || date === null) {
-      return setError(true);
+      return setError({dateError: true, timeError: true});
     }
 
     if (!time || time === null) {
-      return setError(true);
+      return setError({timeError: true});
     }
 
     const data = {
@@ -135,10 +139,10 @@ const MiddleButton = props => {
               onChangeText={task => setTask(task)}
               style={[
                 styles.textInput,
-                {borderColor: error ? colors.red500 : '#F0F1F2'},
+                {borderColor: error.taskTitle ? colors.red500 : '#F0F1F2'},
               ]}
             />
-            {error && (
+            {error.taskTitle && (
               <Text style={styles.errorText}>Task title is required</Text>
             )}
           </View>
@@ -178,7 +182,7 @@ const MiddleButton = props => {
                   onPress={() => showDatePicker()}
                   style={[
                     styles.taskScheduleDate,
-                    {borderColor: error ? colors.red500 : '#F0F1F2'},
+                    {borderColor: error.dateError ? colors.red500 : '#F0F1F2'},
                   ]}>
                   <Icon name="calendar-plus" size={20} />
                   <View style={{flex: 1}}>
@@ -198,7 +202,7 @@ const MiddleButton = props => {
                     )}
                   </View>
                 </TouchableOpacity>
-                {error && (
+                {error.dateError && (
                   <Text style={styles.errorText}>Date is required</Text>
                 )}
               </View>
@@ -207,7 +211,7 @@ const MiddleButton = props => {
                   onPress={() => showTimePicker()}
                   style={[
                     styles.taskScheduleTime,
-                    {borderColor: error ? colors.red500 : '#F0F1F2'},
+                    {borderColor: error.timeError ? colors.red500 : '#F0F1F2'},
                   ]}>
                   <Icon name="clock-time-three-outline" size={20} />
                   <View style={{flex: 1}}>
@@ -227,7 +231,7 @@ const MiddleButton = props => {
                     )}
                   </View>
                 </TouchableOpacity>
-                {error && (
+                {error.timeError && (
                   <Text style={styles.errorText}>Time is required</Text>
                 )}
               </View>
