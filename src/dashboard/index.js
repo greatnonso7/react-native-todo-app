@@ -37,6 +37,7 @@ const Dashboard = props => {
   React.useEffect(() => {
     props.getTasks();
   });
+  props.getTasks();
 
   console.log(tasks);
 
@@ -121,7 +122,8 @@ const Dashboard = props => {
                       </View>
                     </View>
                     <View>
-                      <TouchableOpacity onPress={completeTask(item.taskId)}>
+                      <TouchableOpacity
+                        onPress={() => completeTask(item.taskId)}>
                         <View style={styles.radio} />
                       </TouchableOpacity>
                     </View>
