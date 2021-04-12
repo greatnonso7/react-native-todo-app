@@ -37,9 +37,6 @@ const Dashboard = props => {
   React.useEffect(() => {
     props.getTasks();
   });
-  props.getTasks();
-
-  console.log(tasks);
 
   return (
     <SafeAreaView style={styles.container}>
