@@ -4,18 +4,19 @@ import {View, Text, TextInput, TouchableOpacity, Button} from 'react-native';
 import {styles} from './style';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {connect} from 'react-redux';
-import {hp, wp} from '../responsive-dimesion';
+import {hp} from '../responsive-dimesion';
 import {normalColors as colors} from '../../colors';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import Moment from 'moment';
 import {useNavigation} from '@react-navigation/core';
 
 const MiddleButton = props => {
   const refRBSheet = React.useRef();
-  const [date, setDate] = React.useState(new Date(Date.now()));
-  const [time, setTime] = React.useState(new Date(Date.now()));
-  const [showTime, setShowTime] = React.useState(false);
-  const [showDate, setShowDate] = React.useState(false);
+  const [date, setDate] = React.useState(null);
+  const [time, setTime] = React.useState(null);
+  const [isDatePickerVisible, setDatePickerVisibility] = React.useState(false);
+  const [isTimePickerVisible, setTimePickerVisibility] = React.useState(false);
   const [task, setTask] = React.useState('');
   const [error, setError] = React.useState(false);
 
@@ -25,23 +26,28 @@ const MiddleButton = props => {
   });
 
   const navigation = useNavigation();
-
-  const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    // setShow(Platform.OS === 'ios');
-    setDate(currentDate);
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
   };
-  const onTimeChange = (event, selectedTime) => {
-    const currentDate = selectedTime;
-    // setShow(Platform.OS === 'ios');
-    setTime(currentDate);
-  };
-  const showDatepicker = () => {
-    setShowDate(true);
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
   };
 
-  const showTimepicker = () => {
-    setShowTime(true);
+  const handleConfirm = date => {
+    setDate(date);
+    hideDatePicker();
+  };
+
+  const showTimePicker = () => {
+    setTimePickerVisibility(true);
+  };
+  const hideTimePicker = () => {
+    setTimePickerVisibility(false);
+  };
+
+  const handleTimeConfirm = date => {
+    setTime(date);
+    hideTimePicker();
   };
 
   const selectType = (id, value) => {
@@ -50,6 +56,14 @@ const MiddleButton = props => {
 
   const addTask = async () => {
     if (!task || task.length === 0) {
+      return setError(true);
+    }
+
+    if (!date || date === null) {
+      return setError(true);
+    }
+
+    if (!time || time === null) {
       return setError(true);
     }
 
@@ -68,8 +82,8 @@ const MiddleButton = props => {
     refRBSheet.current.close();
     setTask('');
     setError(false);
-    setDate(new Date(Date.now()));
-    setTime(new Date().getTime());
+    setDate(null);
+    setTime(null);
     navigation.push('Dashboard');
   };
   return (
@@ -89,12 +103,13 @@ const MiddleButton = props => {
         closeOnDragDown={true}
         closeOnPressMask={false}
         animationType="slide"
-        height={hp(580)}
+        height={hp(600)}
         customStyles={{
           container: {
             borderTopLeftRadius: hp(30),
             borderTopRightRadius: hp(30),
             height: '70%',
+            elevation: 24,
           },
           wrapper: {
             backgroundColor: 'transparent',
@@ -105,7 +120,6 @@ const MiddleButton = props => {
             },
             shadowOpacity: 0.58,
             shadowRadius: 16.0,
-            elevation: 24,
           },
           draggableIcon: {
             backgroundColor: '#000',
@@ -161,48 +175,66 @@ const MiddleButton = props => {
             <View style={styles.taskScheduleContainer}>
               <View>
                 <TouchableOpacity
-                  onPress={showDatepicker}
-                  style={styles.taskScheduleDate}>
+                  onPress={() => showDatePicker()}
+                  style={[
+                    styles.taskScheduleDate,
+                    {borderColor: error ? colors.red500 : '#F0F1F2'},
+                  ]}>
                   <Icon name="calendar-plus" size={20} />
                   <View style={{flex: 1}}>
-                    {showDate === true ? (
-                      <DateTimePicker
-                        testID="dateTimePicker"
-                        value={date}
-                        mode={'date'}
-                        is24Hour={true}
-                        display="calendar"
-                        onChange={onDateChange}
+                    {isDatePickerVisible === true ? (
+                      <DateTimePickerModal
+                        isVisible={isDatePickerVisible}
+                        mode="date"
+                        onConfirm={handleConfirm}
+                        onCancel={hideDatePicker}
                       />
                     ) : (
-                      <Text style={styles.scheduleText}>Select a date</Text>
+                      <Text style={styles.scheduleText}>
+                        {date !== null
+                          ? Moment(date).calendar('MMMM Do YYYY')
+                          : 'Select Date'}
+                      </Text>
                     )}
                   </View>
                 </TouchableOpacity>
+                {error && (
+                  <Text style={styles.errorText}>Date is required</Text>
+                )}
               </View>
-              <TouchableOpacity
-                onPress={showTimepicker}
-                style={styles.taskScheduleTime}>
-                <Icon name="clock-time-three-outline" size={20} />
-                <View style={{flex: 1}}>
-                  {showTime === true ? (
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      value={time}
-                      mode={'time'}
-                      is24Hour={true}
-                      display="calendar"
-                      onChange={onTimeChange}
-                    />
-                  ) : (
-                    <Text style={styles.scheduleText}>Select time</Text>
-                  )}
-                </View>
-              </TouchableOpacity>
+              <View>
+                <TouchableOpacity
+                  onPress={() => showTimePicker()}
+                  style={[
+                    styles.taskScheduleTime,
+                    {borderColor: error ? colors.red500 : '#F0F1F2'},
+                  ]}>
+                  <Icon name="clock-time-three-outline" size={20} />
+                  <View style={{flex: 1}}>
+                    {isTimePickerVisible === true ? (
+                      <DateTimePickerModal
+                        isVisible={isTimePickerVisible}
+                        mode="time"
+                        onConfirm={handleTimeConfirm}
+                        onCancel={hideTimePicker}
+                      />
+                    ) : (
+                      <Text style={styles.scheduleText}>
+                        {time !== null
+                          ? Moment(time).format('LT')
+                          : 'Select Time'}
+                      </Text>
+                    )}
+                  </View>
+                </TouchableOpacity>
+                {error && (
+                  <Text style={styles.errorText}>Time is required</Text>
+                )}
+              </View>
             </View>
           </View>
 
-          <View style={[styles.inputContainer, {marginTop: hp(30)}]}>
+          <View style={[styles.inputContainer, {marginTop: hp(20)}]}>
             <View style={styles.submitButtonContainer}>
               <TouchableOpacity
                 activeOpacity={0.6}

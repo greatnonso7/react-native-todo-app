@@ -110,7 +110,7 @@ const Dashboard = props => {
                       <View
                         style={{flexDirection: 'row', alignItems: 'center'}}>
                         <Icon name="calendar-today" size={25} />
-                        <Text>{Moment(item.date).format('DD/MM/YYYY')}</Text>
+                        <Text>{Moment(item.date).format()}</Text>
                       </View>
                       <View
                         style={{flexDirection: 'row', alignItems: 'center'}}>

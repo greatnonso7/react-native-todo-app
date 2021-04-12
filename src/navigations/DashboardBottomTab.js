@@ -1,8 +1,8 @@
 import React from 'react';
-import {Text, TouchableOpacity, StyleSheet, View} from 'react-native';
+import {TouchableOpacity, StyleSheet, View} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/AntDesign';
-import {hp, wp, getBottomSpace} from '../shared/responsive-dimesion';
+import {hp, wp} from '../shared/responsive-dimesion';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import {globalStyle} from '../style';
 import {consumerNormalColors as colors} from '../colors';
@@ -74,15 +74,11 @@ function DashboardBottomTab() {
       tabBarOptions={{
         activeTintColor: 'red',
         inactiveTintColor: '#303041',
-        tabStyle: {
-          height: wp(70),
-          paddingBottom: wp(10),
-        },
+
         style: {
-          height: wp(80) + getBottomSpace(),
+          height: wp(80),
           flexDirection: 'row',
           justifyContent: 'space-between',
-          // backgroundColor: 'aqua',
           borderTopWidth: hp(0),
         },
       }}>
