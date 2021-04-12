@@ -1,4 +1,5 @@
 import {reducerActions as reducers} from './reducer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const IState = {
   isError: false,
